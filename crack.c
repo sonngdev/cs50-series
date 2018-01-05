@@ -19,11 +19,11 @@ int main(int argc, string argv[])
     salt[2] = '\0';                     // hash & salt (first 2 chars of hash)
 
     char charArr[CHARNUM];
-    for (int i = 0, j = 65; i < CHARNUM; i++, j++)
+    for (int i = 0, j = 122; i < CHARNUM; i++, j--)
     {
-        if (j == 91)
+        if (j == 96)
         {
-            j = 97;
+            j = 90;
         }
         charArr[i] = (char) j;
     }                                   // initialize array of 52 chars
