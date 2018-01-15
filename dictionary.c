@@ -8,11 +8,11 @@
 
 #include "dictionary.h"
 
-bool freeup(node* this_node);
-bool isempty(node* this_node);
+bool freeup(node *this_node);
+bool isempty(node *this_node);
 
 // root node
-node* root;
+node *root;
 
 // char in dictionary file
 char ch;
@@ -24,7 +24,7 @@ int word_count;
 bool load(const char *dictionary)
 {
     // open dictionary
-    FILE* dict = fopen(dictionary, "r");
+    FILE *dict = fopen(dictionary, "r");
 
     // initialize root node
     root = malloc(sizeof(node));
@@ -38,7 +38,7 @@ bool load(const char *dictionary)
     word_count = 0;
 
     // dealing with root node first
-    node* this_node = root;
+    node *this_node = root;
 
     // get every char in dictionary
     for (ch = fgetc(dict); ch != EOF; ch = fgetc(dict))
@@ -53,7 +53,7 @@ bool load(const char *dictionary)
             if (!this_node->children[child_index])
             {
                 // create a new node
-                node* new_node = malloc(sizeof(node));
+                node *new_node = malloc(sizeof(node));
                 new_node->is_word = false;
                 for (int i = 0; i < 27; i++)
                 {
@@ -101,7 +101,7 @@ unsigned int size(void)
 bool check(const char *word)
 {
     // start from root node
-    node* this_node = root;
+    node *this_node = root;
 
     // check every char in word
     for (int i = 0, len = strlen(word); i < len; i++)
@@ -140,7 +140,7 @@ bool unload(void)
 
 // Recursive function that free up every child node in a node, and the node itself
 // Return true if cleared up successfully, otherwise return false
-bool freeup(node* this_node)
+bool freeup(node *this_node)
 {
     // child node array is empty
     if (isempty(this_node))
@@ -181,7 +181,7 @@ bool freeup(node* this_node)
 }
 
 // Check if a node's child node array is empty
-bool isempty(node* this_node)
+bool isempty(node *this_node)
 {
     // go through child node array
     for (int i = 0; i < 27; i++)
