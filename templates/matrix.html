@@ -1,0 +1,56 @@
+<table class="matrix">
+    <thead>
+        <tr>
+            <!--3 blank cells-->
+            <th></th>
+            <th></th>
+            <th></th>
+
+            <!--Chars in string2-->
+            {% for char in s2 %}
+                <th>{{ char }}</th>
+            {% endfor %}
+        </tr>
+
+        <tr>
+            <!--2 blank cells-->
+            <th></th>
+            <th></th>
+
+            <!--Numbering-->
+            {% for i in range(s2|length + 1) %}
+                <th>{{ i }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+
+    <tbody>
+        <!--Every row-->
+        {% for i in range(s1|length + 1) %}
+            <tr>
+
+                <!--Row 0-->
+                {% if i == 0 %}
+
+                    <!--Leave blank-->
+                    <th></th>
+
+                <!--Other rows-->
+                {% else %}
+
+                    <!--Chars in string 1-->
+                    <th>{{ s1[i-1] }}</th>
+
+                {% endif %}
+
+                <!--Numbering-->
+                <th>{{ i }}</th>
+
+                <!--Cost in each cell-->
+                {% for cell in matrix[i] %}
+                    <td>{{ cell[0] }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

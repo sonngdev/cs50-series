@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <form action="/score" method="post">
+        <input type="text" name="string1" placeholder="String 1"/>
+        <input type="text" name="string2" placeholder="String 2"/>
+        <input type="submit" name="Score"/>
+    </form>
+{% endblock %}
