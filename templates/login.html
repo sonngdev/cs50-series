@@ -5,7 +5,7 @@ Log In
 {% endblock title %}
 
 {% block body %}
-<form action="/login" method="POST">
+<form action="/login" method="POST" class="mb-3">
   <div class="form-group">
     <label>Username</label>
     <input type="text" placeholder="Your username" name="username" class="form-control" />
@@ -16,4 +16,6 @@ Log In
   </div>
   <button type="submit" class="btn btn-warning">Log in</button>
 </form>
+
+<p><small>Does not have an account? <a href="/signup">Sign up</a></small></p>
 {% endblock body %}
