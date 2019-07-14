@@ -22,8 +22,8 @@ db = scoped_session(sessionmaker(bind=engine))
 
 
 @app.before_request
-def ensure_session_user_id():
-    if not session.get("user_id"): session["user_id"] = 0
+def ensure_session_username():
+    if not session.get("username"): session["username"] = ''
 
 @app.route("/")
 def index():
@@ -47,7 +47,7 @@ def signup():
     db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {"username": username, "password": password})
     db.commit()
     user = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
-    session["user_id"] = user.id
+    session["username"] = user.id
 
     return render_template("home.html")
 
@@ -68,11 +68,11 @@ def login():
         flash("Username or password is incorrect")
         return render_template("login.html")
 
-    session["user_id"] = user.id
+    session["username"] = user.username
 
     return render_template("home.html")
 
 @app.route("/logout")
 def logout():
-    session["user_id"] = 0
+    session["username"] = ''
     return render_template("home.html")
