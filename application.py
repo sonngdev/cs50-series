@@ -47,7 +47,7 @@ def signup():
     db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {"username": username, "password": password})
     db.commit()
     user = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
-    session["username"] = user.id
+    session["username"] = user.username
 
     return render_template("search.html")
 
