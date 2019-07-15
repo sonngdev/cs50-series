@@ -104,5 +104,35 @@ def show_book(id):
 
     reviews = db.execute("SELECT ubr.opinion AS opinion, ubr.rating AS rating, users.username AS username FROM user_book_reviews ubr INNER JOIN users ON ubr.user_id = users.id WHERE ubr.book_id = :id",
                             {"id": id}).fetchall()
+    can_write_review = session["username"] not in list(map(lambda review: review.username, reviews))
 
-    return render_template("book.html", book=book, reviews=reviews)
+    return render_template("book.html", book=book, reviews=reviews, can_write_review=can_write_review)
+
+@app.route("/books/<int:id>/reviews", methods=["POST"])
+def add_review(id):
+    if not session["username"]:
+        redirect(url_for('login'))
+
+    book = db.execute("SELECT * FROM books WHERE id = :id",
+                        {"id": id}).fetchone()
+    if not book:
+        render_template("error.html", message="Book does not exist.")
+
+    user = db.execute("SELECT * FROM users WHERE username = :username",
+                        {"username": session["username"]}).fetchone()
+    if not user:
+        render_template("error.html", message="User does not exist.")
+
+    existing_review = db.execute("SELECT * FROM user_book_reviews WHERE book_id = :book_id AND user_id = :user_id",
+                                {"book_id": book.id, "user_id": user.id}).fetchone()
+    if existing_review:
+        render_template("error.html", message="You had already written a review for this book.")
+
+    rating = request.form.get("rating")
+    opinion = request.form.get("opinion")
+
+    db.execute("INSERT INTO user_book_reviews (rating, opinion, book_id, user_id) VALUES (:rating, :opinion, :book_id, :user_id)",
+                {"rating": rating, "opinion": opinion, "book_id": book.id, "user_id": user.id})
+    db.commit()
+
+    return redirect(url_for("show_book", id=book.id))
