@@ -81,7 +81,7 @@ def logout():
 @app.route("/search")
 def search():
     if not session["username"]:
-        redirect(url_for('login'))
+        return redirect(url_for('login'))
 
     query = request.args.get("query")
     results = []
@@ -95,7 +95,7 @@ def search():
 @app.route("/books/<int:id>")
 def show_book(id):
     if not session["username"]:
-        redirect(url_for('login'))
+        return redirect(url_for('login'))
 
     book = db.execute("SELECT books.id AS id, books.isbn AS isbn, books.title AS title, authors.name AS author_name FROM books INNER JOIN authors ON books.author_id = authors.id WHERE books.id = :id",
                         {"id": id}).fetchone()
@@ -121,7 +121,7 @@ def show_book(id):
 @app.route("/books/<int:id>/reviews", methods=["POST"])
 def add_review(id):
     if not session["username"]:
-        redirect(url_for('login'))
+        return redirect(url_for('login'))
 
     book = db.execute("SELECT * FROM books WHERE id = :id",
                         {"id": id}).fetchone()
