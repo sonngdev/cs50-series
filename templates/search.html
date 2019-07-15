@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Search
+{% endblock title %}
+
+{% block body %}
+<p class="lead">Search for a book's ISBN number, title, or author name.</p>
+
+<form action="/search" method="GET" class="form-inline mb-3">
+  <input type="text" placeholder="Your query" name="query" class="form-control mr-2" value="{{ query or '' }}" />
+  <button type="submit" class="btn btn-warning">Search</button>
+</form>
+
+{% if query %}
+  <p class="mb-4">Your query: <strong>{{ query }}</strong></p>
+{% endif %}
+
+{% for result in results %}
+  <div class="mb-4">
+    <a href="#">{{ result.title }}</a>
+    <p class="mb-0"><small>{{ result.author_name }}</small></p>
+    <p class="mb-0"><small>ISBN: {{ result.isbn }}</small></p>
+  </div>
+{% endfor %}
+
+{% if not results %}
+  <p>No results were found.</p>
+{% endif %}
+{% endblock body %}

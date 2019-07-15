@@ -49,7 +49,7 @@ def signup():
     user = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
     session["username"] = user.id
 
-    return render_template("home.html")
+    return render_template("search.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -70,9 +70,23 @@ def login():
 
     session["username"] = user.username
 
-    return render_template("home.html")
+    return render_template("search.html")
 
 @app.route("/logout")
 def logout():
     session["username"] = ''
     return render_template("home.html")
+
+@app.route("/search")
+def search():
+    if not session["username"]:
+        redirect(url_for('login'))
+
+    query = request.args.get("query")
+    results = []
+
+    if query:
+        results = db.execute("SELECT books.isbn AS isbn, books.title AS title, authors.name AS author_name FROM books INNER JOIN authors ON books.author_id = authors.id WHERE books.isbn ILIKE :query OR books.title ILIKE :query OR authors.name ILIKE :query",
+                                {"query": "%{}%".format(query)}).fetchall()
+
+    return render_template("search.html", query=query, results=results)
