@@ -126,20 +126,24 @@ def add_review(id):
     book = db.execute("SELECT * FROM books WHERE id = :id",
                         {"id": id}).fetchone()
     if not book:
-        render_template("error.html", message="Book does not exist.")
+        return render_template("error.html", message="Book does not exist.")
 
     user = db.execute("SELECT * FROM users WHERE username = :username",
                         {"username": session["username"]}).fetchone()
     if not user:
-        render_template("error.html", message="User does not exist.")
+        return render_template("error.html", message="User does not exist.")
 
     existing_review = db.execute("SELECT * FROM user_book_reviews WHERE book_id = :book_id AND user_id = :user_id",
                                 {"book_id": book.id, "user_id": user.id}).fetchone()
     if existing_review:
-        render_template("error.html", message="You had already written a review for this book.")
+        return render_template("error.html", message="You had already written a review for this book.")
 
     rating = request.form.get("rating")
     opinion = request.form.get("opinion")
+
+    if not rating:
+        flash("Rating cannot be blank.")
+        return redirect(url_for("show_book", id=book.id))
 
     db.execute("INSERT INTO user_book_reviews (rating, opinion, book_id, user_id) VALUES (:rating, :opinion, :book_id, :user_id)",
                 {"rating": rating, "opinion": opinion, "book_id": book.id, "user_id": user.id})
