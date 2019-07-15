@@ -13,6 +13,9 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="/">CS50W Project 1</a>
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item"><a href="/search" class="nav-link">Search</a></li>
+    </ul>
     <ul class="navbar-nav ml-auto">
       {% with username = session["username"] %}
       {% if not username %}
