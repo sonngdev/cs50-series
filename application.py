@@ -4,6 +4,7 @@ from flask import Flask, session, render_template, request, flash, redirect, url
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+import requests
 
 app = Flask(__name__)
 
@@ -87,7 +88,7 @@ def search():
 
     if query:
         results = db.execute("SELECT books.id AS id, books.isbn AS isbn, books.title AS title, authors.name AS author_name FROM books INNER JOIN authors ON books.author_id = authors.id WHERE books.isbn ILIKE :query OR books.title ILIKE :query OR authors.name ILIKE :query",
-                                {"query": "%{}%".format(query)}).fetchall()
+                                {"query": f"%{query}%"}).fetchall()
 
     return render_template("search.html", query=query, results=results)
 
@@ -102,11 +103,20 @@ def show_book(id):
     if not book:
         abort(404)
 
+    response = requests.get("https://goodreads.com/book/review_counts.json",
+                            params={"key": "dYolMNb3RBl70KPWjAKMA", "isbns": book.isbn})
+    goodreads_book = response.json()["books"][0]
+    goodreads_avg_rating = goodreads_book["average_rating"]
+    goodreads_ratings_count = goodreads_book["ratings_count"]
+
     reviews = db.execute("SELECT ubr.opinion AS opinion, ubr.rating AS rating, users.username AS username FROM user_book_reviews ubr INNER JOIN users ON ubr.user_id = users.id WHERE ubr.book_id = :id",
                             {"id": id}).fetchall()
     can_write_review = session["username"] not in list(map(lambda review: review.username, reviews))
 
-    return render_template("book.html", book=book, reviews=reviews, can_write_review=can_write_review)
+    return render_template("book.html", book=book,
+                            goodreads_avg_rating=goodreads_avg_rating,
+                            goodreads_ratings_count=goodreads_ratings_count,
+                            reviews=reviews, can_write_review=can_write_review)
 
 @app.route("/books/<int:id>/reviews", methods=["POST"])
 def add_review(id):

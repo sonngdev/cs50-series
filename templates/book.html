@@ -8,6 +8,10 @@
 <p class="lead mb-2">{{ book.author_name }}</p>
 <p class="lead mb-2">ISBN: {{ book.isbn }}</p>
 
+<h2 class="h4 mt-4">Goodreads ratings</h2>
+<p class="mb-1">Average rating: <strong>{{ goodreads_avg_rating }}</strong></p>
+<p class="mb-1">Number of ratings: <strong>{{ goodreads_ratings_count }}</strong></p>
+
 <h2 class="h4 mt-4">User reviews</h2>
 {% for review in reviews %}
   <div class="mt-3">

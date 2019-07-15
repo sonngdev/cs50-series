@@ -24,7 +24,7 @@ Search
   </div>
 {% endfor %}
 
-{% if not results %}
+{% if query and not results %}
   <p>No results were found.</p>
 {% endif %}
 {% endblock body %}
