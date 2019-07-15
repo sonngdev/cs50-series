@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session, render_template, request, flash, redirect, url_for
+from flask import Flask, session, render_template, request, flash, redirect, url_for, abort
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -86,7 +86,23 @@ def search():
     results = []
 
     if query:
-        results = db.execute("SELECT books.isbn AS isbn, books.title AS title, authors.name AS author_name FROM books INNER JOIN authors ON books.author_id = authors.id WHERE books.isbn ILIKE :query OR books.title ILIKE :query OR authors.name ILIKE :query",
+        results = db.execute("SELECT books.id AS id, books.isbn AS isbn, books.title AS title, authors.name AS author_name FROM books INNER JOIN authors ON books.author_id = authors.id WHERE books.isbn ILIKE :query OR books.title ILIKE :query OR authors.name ILIKE :query",
                                 {"query": "%{}%".format(query)}).fetchall()
 
     return render_template("search.html", query=query, results=results)
+
+@app.route("/books/<int:id>")
+def show_book(id):
+    if not session["username"]:
+        redirect(url_for('login'))
+
+    book = db.execute("SELECT books.id AS id, books.isbn AS isbn, books.title AS title, authors.name AS author_name FROM books INNER JOIN authors ON books.author_id = authors.id WHERE books.id = :id",
+                        {"id": id}).fetchone()
+
+    if not book:
+        abort(404)
+
+    reviews = db.execute("SELECT ubr.opinion AS opinion, ubr.rating AS rating, users.username AS username FROM user_book_reviews ubr INNER JOIN users ON ubr.user_id = users.id WHERE ubr.book_id = :id",
+                            {"id": id}).fetchall()
+
+    return render_template("book.html", book=book, reviews=reviews)

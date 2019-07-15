@@ -18,7 +18,7 @@ Search
 
 {% for result in results %}
   <div class="mb-4">
-    <a href="#">{{ result.title }}</a>
+    <a href="books/{{ result.id }}">{{ result.title }}</a>
     <p class="mb-0"><small>{{ result.author_name }}</small></p>
     <p class="mb-0"><small>ISBN: {{ result.isbn }}</small></p>
   </div>

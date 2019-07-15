@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+{{ book.title }}
+{% endblock title %}
+
+{% block body %}
+<p class="lead mb-2">{{ book.author_name }}</p>
+<p class="lead mb-2">ISBN: {{ book.isbn }}</p>
+
+<h2 class="h4 mt-4">User reviews</h2>
+{% for review in reviews %}
+  <div class="mb-4">
+    <p><strong>{{ review.username }}</strong></p>
+    <p>Rating: <strong>{{ review.rating }}</strong></p>
+    <p>Opinion: <strong>{{ review.opinion }}</strong></p>
+  </div>
+{% endfor %}
+
+{% if not reviews %}
+<p>This book has not gotten any review yet. Be the first to write one.</p>
+{% endif %}
+
+{% endblock body %}
