@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session, render_template, request, flash, redirect, url_for, abort
+from flask import Flask, session, render_template, request, flash, redirect, url_for, abort, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -146,3 +146,23 @@ def add_review(id):
     db.commit()
 
     return redirect(url_for("show_book", id=book.id))
+
+@app.route("/api/<string:isbn>")
+def api(isbn):
+    book = db.execute("SELECT books.title AS title, books.isbn AS isbn, books.year AS year, authors.name AS author_name FROM books INNER JOIN authors ON books.author_id = authors.id WHERE books.isbn = :isbn",
+                        {"isbn": isbn}).fetchone()
+    if not book:
+        abort(404)
+
+    response = requests.get("https://goodreads.com/book/review_counts.json",
+                            params={"key": "dYolMNb3RBl70KPWjAKMA", "isbns": isbn})
+    goodreads_book = response.json()["books"][0]
+
+    return jsonify({
+        "title": book.title,
+        "author": book.author_name,
+        "year": book.year,
+        "isbn": book.isbn,
+        "review_count": goodreads_book["ratings_count"],
+        "average_score": float(goodreads_book["average_rating"]),
+    })
