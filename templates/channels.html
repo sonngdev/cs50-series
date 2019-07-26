@@ -6,7 +6,7 @@
 
 {% block body %}
   <h2 class="h5">Create your channel</h2>
-  <form class="form-inline mb-4" action="/channels" method="POST">
+  <form class="form-inline mb-4" action="{{ url_for('channels_index') }}" method="POST">
     <label class="sr-only" for="channel-name">Channel name</label>
     <input type="text" class="form-control mb-2 mr-sm-2" id="channel-name" name="channelname" placeholder="Your channel" />
     <button type="submit" class="btn btn-primary mb-2">Submit</button>
@@ -16,7 +16,7 @@
   <ul>
     {% for channelname in channels %}
       <li>
-        <a href="#">
+        <a href="{{ url_for('channels_show', channelname=channelname) }}">
           {{ channelname }}
         </a>
       </li>

@@ -1,7 +1,7 @@
 import os
 import collections
 
-from flask import Flask, render_template, flash, request
+from flask import Flask, render_template, flash, request, abort
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
@@ -29,3 +29,10 @@ def channels_index():
             channels[channelname] = []
 
     return render_template('channels.html', channels=channels)
+
+@app.route('/channels/<string:channelname>', methods=['GET', 'POST'])
+def channels_show(channelname):
+    if channelname not in channels:
+        abort(404)
+
+    return render_template('channel.html', channelname=channelname, messages=channels[channelname])
