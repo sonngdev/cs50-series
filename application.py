@@ -1,5 +1,6 @@
 import os
 import collections
+import datetime
 
 from flask import Flask, render_template, flash, request, abort
 from flask_socketio import SocketIO, emit
@@ -30,9 +31,21 @@ def channels_index():
 
     return render_template('channels.html', channels=channels)
 
-@app.route('/channels/<string:channelname>', methods=['GET', 'POST'])
+@app.route('/channels/<string:channelname>')
 def channels_show(channelname):
     if channelname not in channels:
         abort(404)
 
     return render_template('channel.html', channelname=channelname, messages=channels[channelname])
+
+@socketio.on('submit message')
+def submit_message(data):
+    text = data['message']
+    sender = data['username']
+    timestamp = datetime.datetime.now()
+
+    message = {'text': text, 'sender': sender, 'timestamp': timestamp}
+    json = {'text': text, 'sender': sender, 'timestamp': timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f%z')}
+
+    channels[data['channelname']].append(message)
+    emit('announce message', json, broadcast=True)

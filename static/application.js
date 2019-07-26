@@ -5,5 +5,5 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('username', username);
   }
 
-  document.querySelector('.username').textContent = username
+  document.querySelector('#username').textContent = username
 })

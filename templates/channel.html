@@ -7,22 +7,21 @@
 {% block body %}
   <h2 class="h5">Messages</h2>
 
-  <ul>
+  <ul id="message-list">
     {% for message in messages %}
-      <li>
-        <p>{{ message['text'] }}</p>
-        <span><small>{{ message['sender'] }} | {{ message['timestamp'] }}</small></span>
+      <li class="mb-3">
+        <p class="mb-0">{{ message['text'] }}</p>
+        <span><small>{{ message['sender'] }} | {{ message['timestamp'].strftime('%d-%m-%Y, %I:%M:%S %p') }}</small></span>
       </li>
     {% endfor %}
   </ul>
 
-  {% if not messages %}
-    <p><em>No message in this channel yet.</em></p>
-  {% endif %}
-
-  <form class="form-inline mb-4" action="{{ url_for('channels_show', channelname=channelname) }}" method="POST">
-    <label class="sr-only" for="channel-name">Your message</label>
-    <input type="text" class="form-control mb-2 mr-sm-2 w-75" id="channel-name" name="channelname" placeholder="Your message" />
+  <form class="form-inline mb-4" id="form-message">
+    <label class="sr-only" for="message">Your message</label>
+    <input type="text" class="form-control mb-2 mr-sm-2 w-75" id="message" name="message" placeholder="Your message" />
+    <input type="hidden" id="channelname" value="{{ channelname }}" />
     <button type="submit" class="btn btn-primary mb-2">Submit</button>
   </form>
+
+  <script src="{{ url_for('static', filename='channel.js') }}"></script>
 {% endblock body %}
