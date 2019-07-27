@@ -44,12 +44,15 @@ def submit_message(data):
     text = data['message']
     sender = data['username']
     timestamp = datetime.datetime.now()
+    messages = channels[data['channelname']]
     global counter
 
     message = {'id': counter, 'text': text, 'sender': sender, 'timestamp': timestamp}
     json = {'id': counter, 'text': text, 'sender': sender, 'timestamp': timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f%z')}
 
-    channels[data['channelname']].append(message)
+    messages.append(message)
+    messages = messages[-100:]
+
     emit('announce message', json, broadcast=True)
     counter += 1
 
