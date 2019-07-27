@@ -9,7 +9,7 @@
 
   <ul id="message-list">
     {% for message in messages %}
-      <li class="mb-3">
+      <li class="mb-3 message" data-sender="{{ message['sender'] }}" data-message-id="{{ message['id'] }}">
         <p class="mb-0">{{ message['text'] }}</p>
         <span><small>{{ message['sender'] }} | {{ message['timestamp'].strftime('%d-%m-%Y, %I:%M:%S %p') }}</small></span>
       </li>

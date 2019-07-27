@@ -11,6 +11,7 @@ socketio = SocketIO(app)
 
 
 channels = collections.OrderedDict()
+counter = 1;
 
 @app.route("/")
 def index():
@@ -43,9 +44,30 @@ def submit_message(data):
     text = data['message']
     sender = data['username']
     timestamp = datetime.datetime.now()
+    global counter
 
-    message = {'text': text, 'sender': sender, 'timestamp': timestamp}
-    json = {'text': text, 'sender': sender, 'timestamp': timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f%z')}
+    message = {'id': counter, 'text': text, 'sender': sender, 'timestamp': timestamp}
+    json = {'id': counter, 'text': text, 'sender': sender, 'timestamp': timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f%z')}
 
     channels[data['channelname']].append(message)
     emit('announce message', json, broadcast=True)
+    counter += 1
+
+@socketio.on('delete message')
+def delete_message(data):
+    channelname = data['channelname']
+    message_id = int(data['message_id'])
+    deleter = data['deleter']
+
+    if channelname not in channels:
+        return
+
+    messages = channels[channelname]
+    message = [m for m in messages if m['id'] == message_id][0]
+
+    if not message or message['sender'] != deleter:
+        return
+
+    messages.remove(message)
+    message['timestamp'] = message['timestamp'].strftime('%Y-%m-%dT%H:%M:%S.%f%z')
+    emit('announce deleted message', message, broadcast=True)
