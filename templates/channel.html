@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  {{ channelname }}
+{% endblock title %}
+
+{% block body %}
+  <h2 class="h5">Messages</h2>
+
+  <ul id="message-list">
+    {% for message in messages %}
+      <li class="mb-3 message" data-sender="{{ message['sender'] }}" data-message-id="{{ message['id'] }}">
+        <p class="mb-0">{{ message['text'] }}</p>
+        <span><small>{{ message['sender'] }} | {{ message['timestamp'].strftime('%d-%m-%Y, %I:%M:%S %p') }}</small></span>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <form class="form-inline mb-4" id="form-message">
+    <label class="sr-only" for="message">Your message</label>
+    <input type="text" class="form-control mb-2 mr-sm-2 w-75" id="message" name="message" placeholder="Your message" />
+    <input type="hidden" id="channelname" value="{{ channelname }}" />
+    <button type="submit" class="btn btn-primary mb-2">Submit</button>
+  </form>
+
+  <script src="{{ url_for('static', filename='channel.js') }}"></script>
+{% endblock body %}
