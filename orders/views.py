@@ -4,13 +4,22 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
+from .models import Cart
+
 # Create your views here.
 def index(request):
-    if not request.user.is_authenticated:
+    user = request.user
+    if not user.is_authenticated:
         return render(request, 'auth/login.html', {'message': None})
 
+    try:
+        cart = user.cart
+    except:
+        cart = Cart.objects.create(user=user)
+
     context = {
-        'user': request.user
+        'user': user,
+        'cart_size': len(cart.items.all()),
     }
     return render(request, 'orders/index.html', context)
 

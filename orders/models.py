@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 # Create your models here.
 class RegularPizza(models.Model):
@@ -63,3 +66,20 @@ class DinnerPlatter(models.Model):
 
     def __str__(self):
         return self.name
+
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
+
+    def __str__(self):
+        return f'Shopping cart of {self.user.username}'
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    price = models.FloatField(default=0)
+    product_object_id = models.IntegerField()
+    product_content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
+
+    product = GenericForeignKey('product_content_type', 'product_object_id')
+
+    def __str__(self):
+        return f'{self.product_content_type} - {self.product.name} (${self.price})'
