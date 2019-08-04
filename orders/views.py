@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Cart
+from .models import Cart, RegularPizza, SicilianPizza, Topping
 
 # Create your views here.
 def index(request):
@@ -20,6 +20,9 @@ def index(request):
     context = {
         'user': user,
         'cart_size': len(cart.items.all()),
+        'regular_pizzas': RegularPizza.objects.all(),
+        'sicilian_pizzas': SicilianPizza.objects.all(),
+        'toppings': Topping.objects.all(),
     }
     return render(request, 'orders/index.html', context)
 
