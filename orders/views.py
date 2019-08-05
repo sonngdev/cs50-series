@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Cart, CartItem, RegularPizza, SicilianPizza, Topping, Sub, SubAddon, Pasta, Salad, DinnerPlatter
+from .models import Cart, CartItem, Order, RegularPizza, SicilianPizza, Topping, Sub, SubAddon, Pasta, Salad, DinnerPlatter
 
 # Create your views here.
 def index(request):
@@ -82,8 +82,10 @@ def regular_pizza(request):
         product_content_type=ContentType.objects.get_for_model(rp),
     )
     if size == 'small':
+        cart_item.size = 'small'
         cart_item.price = rp.small_price
     elif size == 'large':
+        cart_item.size = 'large'
         cart_item.price = rp.large_price
     cart_item.save()
 
@@ -116,8 +118,10 @@ def sicilian_pizza(request):
         product_content_type=ContentType.objects.get_for_model(sp),
     )
     if size == 'small':
+        cart_item.size = 'small'
         cart_item.price = sp.small_price
     elif size == 'large':
+        cart_item.size = 'large'
         cart_item.price = sp.large_price
     cart_item.save()
 
@@ -150,8 +154,10 @@ def sub(request):
         product_content_type=ContentType.objects.get_for_model(sub),
     )
     if size == 'small':
+        cart_item.size = 'small'
         cart_item.price = sub.small_price
     elif size == 'large':
+        cart_item.size = 'large'
         cart_item.price = sub.large_price
     cart_item.save()
 
@@ -217,9 +223,45 @@ def dinner_platter(request):
         product_content_type=ContentType.objects.get_for_model(dp),
     )
     if size == 'small':
+        cart_item.size = 'small'
         cart_item.price = dp.small_price
     elif size == 'large':
+        cart_item.size = 'large'
         cart_item.price = dp.large_price
     cart_item.save();
+
+    return HttpResponseRedirect(reverse('index'))
+
+def cart(request):
+    user = request.user
+    if not user.is_authenticated:
+        return render(request, 'auth/login.html', {'message': None})
+
+    try:
+        cart = user.cart
+    except:
+        cart = Cart.objects.create(user=user)
+
+    all_items = cart.items.all()
+    total = sum(item.price for item in all_items)
+    items = all_items.filter(parent=None).all()
+
+    context = {
+        'user': user,
+        'cart_size': len(items),
+        'items': items,
+        'total': total,
+    }
+    return render(request, 'orders/cart.html', context)
+
+def order(request):
+    user = request.user
+    if not user.is_authenticated:
+        return render(request, 'auth/login.html', {'message': None})
+
+    items = user.cart.items.all()
+    total = sum(item.price for item in items)
+    order = Order.objects.create(user=user, total=total)
+    items.update(status='ordered', order=order)
 
     return HttpResponseRedirect(reverse('index'))
