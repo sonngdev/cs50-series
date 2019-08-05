@@ -31,7 +31,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <form action="/regular_pizza" method="POST">
+              <form action="{% url 'regular_pizza' %}" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="name" value="{{ p.name }}" />
 
@@ -89,7 +89,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <form action="/sicilian_pizza" method="POST">
+              <form action="{% url 'sicilian_pizza' %}" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="name" value="{{ p.name }}" />
 
@@ -151,7 +151,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <form action="/sub" method="POST">
+              <form action="{% url 'sub' %}" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="name" value="{{ s.name }}" />
 
@@ -196,9 +196,10 @@
         <p class="card-text">
           Price: ${{ p.price }}
         </p>
-        <form action="">
+        <form action="{% url 'pasta' %}" method="POST">
+          {% csrf_token %}
           <input type="hidden" name="name" value="{{ p.name }}" />
-          <button type="button" class="btn btn-primary">Add to cart</button>
+          <button class="btn btn-primary">Add to cart</button>
         </form>
       </div>
     </div>
@@ -215,9 +216,10 @@
         <p class="card-text">
           Price: ${{ s.price }}
         </p>
-        <form action="">
+        <form action="{% url 'salad' %}" method="POST">
+          {% csrf_token %}
           <input type="hidden" name="name" value="{{ s.name }}" />
-          <button type="button" class="btn btn-primary">Add to cart</button>
+          <button class="btn btn-primary">Add to cart</button>
         </form>
       </div>
     </div>
@@ -249,8 +251,9 @@
               </button>
             </div>
             <div class="modal-body">
-              <form action="">
+              <form action="{% url 'dinner_platter' %}" method="POST">
                 {% csrf_token %}
+                <input type="hidden" name="name" value="{{ p.name }}" />
 
                 <div class="form-group">
                   <label>Size</label>

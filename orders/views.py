@@ -168,10 +168,58 @@ def sub(request):
     return HttpResponseRedirect(reverse('index'))
 
 def pasta(request):
-    pass
+    user = request.user
+    if not user.is_authenticated:
+        return render(request, 'auth/login.html', {'message': None})
+
+    name = request.POST['name']
+    cart = user.cart
+    pasta = Pasta.objects.get(name=name)
+    cart_item = CartItem.objects.create(
+        cart=cart,
+        price=pasta.price,
+        product_object_id=pasta.pk,
+        product_content_type=ContentType.objects.get_for_model(pasta),
+    )
+
+    return HttpResponseRedirect(reverse('index'))
 
 def salad(request):
-    pass
+    user = request.user
+    if not user.is_authenticated:
+        return render(request, 'auth/login.html', {'message': None})
+
+    name = request.POST['name']
+    cart = user.cart
+    salad = Salad.objects.get(name=name)
+    cart_item = CartItem.objects.create(
+        cart=cart,
+        price=salad.price,
+        product_object_id=salad.pk,
+        product_content_type=ContentType.objects.get_for_model(salad),
+    )
+
+    return HttpResponseRedirect(reverse('index'))
 
 def dinner_platter(request):
-    pass
+    user = request.user
+    if not user.is_authenticated:
+        return render(request, 'auth/login.html', {'message': None})
+
+    name = request.POST['name']
+    size = request.POST['size']
+
+    cart = user.cart
+    dp = DinnerPlatter.objects.get(name=name)
+    cart_item = CartItem(
+        cart=cart,
+        product_object_id=dp.pk,
+        product_content_type=ContentType.objects.get_for_model(dp),
+    )
+    if size == 'small':
+        cart_item.price = dp.small_price
+    elif size == 'large':
+        cart_item.price = dp.large_price
+    cart_item.save();
+
+    return HttpResponseRedirect(reverse('index'))
