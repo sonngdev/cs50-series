@@ -1,0 +1,274 @@
+{% extends '../base.html' %}
+
+{% block title %}
+  Orders
+{% endblock title %}
+
+{% block body %}
+
+  <!-- Regular Pizza -->
+  <h2 class="h4 mt-3">Regular Pizza</h2>
+  <hr>
+  {% for p in regular_pizzas %}
+    <div class="card d-inline-block mr-3 mb-4" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{ p.name }}</h5>
+        <p class="card-text">
+          Small: ${{ p.small_price }}
+          <br>
+          Large: ${{ p.large_price }}
+        </p>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#rp-{{ p.name|slugify }}-modal">Get one...</button>
+      </div>
+
+      <div class="modal fade" id="rp-{{ p.name|slugify }}-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{{ p.name }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form action="{% url 'regular_pizza' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="name" value="{{ p.name }}" />
+
+                <div class="form-group">
+                  <label>Size</label>
+                  <select name="size" class="form-control">
+                    <option value="small">Small - ${{ p.small_price }}</option>
+                    <option value="large">Large - ${{ p.large_price }}</option>
+                  </select>
+                </div>
+
+                {% if p.topping_size is not 0 %}
+                  <div class="form-group">
+                    <label>Toppings</label>
+                    <select name="toppings" class="selectpicker form-control" multiple data-max-options="{{ p.topping_size }}">
+                      {% for t in toppings %}
+                        <option value="{{ t.name }}">{{ t.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                {% endif %}
+
+                <button class="btn btn-primary">Add to cart</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+
+  <!-- Sicilian Pizza -->
+  <h2 class="h4 mt-3">Sicilian Pizza</h2>
+  <hr>
+  {% for p in sicilian_pizzas %}
+    <div class="card d-inline-block mr-3 mb-4" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{ p.name }}</h5>
+        <p class="card-text">
+          Small: ${{ p.small_price }}
+          <br>
+          Large: ${{ p.large_price }}
+        </p>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#sp-{{ p.name|slugify }}-modal">Get one...</button>
+      </div>
+
+      <div class="modal fade" id="sp-{{ p.name|slugify }}-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{{ p.name }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form action="{% url 'sicilian_pizza' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="name" value="{{ p.name }}" />
+
+                <div class="form-group">
+                  <label>Size</label>
+                  <select name="size" class="form-control">
+                    <option value="small">Small - ${{ p.small_price }}</option>
+                    <option value="large">Large - ${{ p.large_price }}</option>
+                  </select>
+                </div>
+
+                {% if p.item_size is not 0 %}
+                  <div class="form-group">
+                    <label>Items</label>
+                    <select name="items" class="selectpicker form-control" multiple data-max-options="{{ p.item_size }}">
+                      {% for t in toppings %}
+                        <option value="{{ t.name }}">{{ t.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                {% endif %}
+
+                <button class="btn btn-primary">Add to cart</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+
+  <!-- Subs -->
+  <h2 class="h4 mt-3">Subs</h2>
+  <hr>
+  {% for s in subs %}
+    <div class="card d-inline-block mr-3 mb-4" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{ s.name }}</h5>
+        <p class="card-text">
+          {% if s.small_price %}
+            Small: ${{ s.small_price }}
+            <br>
+          {% endif %}
+          {% if s.large_price %}
+            Large: ${{ s.large_price }}
+          {% endif %}
+        </p>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#s-{{ s.name|slugify }}-modal">Get one...</button>
+      </div>
+
+      <div class="modal fade" id="s-{{ s.name|slugify }}-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{{ s.name }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form action="{% url 'sub' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="name" value="{{ s.name }}" />
+
+                <div class="form-group">
+                  <label>Size</label>
+                  <select name="size" class="form-control">
+                    {% if s.small_price %}
+                      <option value="small">Small - ${{ s.small_price }}</option>
+                    {% endif %}
+                    {% if s.large_price %}
+                      <option value="large">Large - ${{ s.large_price }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Add-on</label>
+                  <select name="addons" class="selectpicker form-control" multiple>
+                    {% for a in s.addons.all %}
+                      <option value="{{ a.name }}">{{ a.name }} (+${{ a.price }})</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <button class="btn btn-primary">Add to cart</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+
+  <!-- Pasta -->
+  <h2 class="h4 mt-3">Pasta</h2>
+  <hr>
+  {% for p in pastas %}
+    <div class="card d-inline-block mr-3 mb-4" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{ p.name }}</h5>
+        <p class="card-text">
+          Price: ${{ p.price }}
+        </p>
+        <form action="{% url 'pasta' %}" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="name" value="{{ p.name }}" />
+          <button class="btn btn-primary">Add to cart</button>
+        </form>
+      </div>
+    </div>
+  {% endfor %}
+
+
+  <!-- Salad -->
+  <h2 class="h4 mt-3">Salad</h2>
+  <hr>
+  {% for s in salads %}
+    <div class="card d-inline-block mr-3 mb-4" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{ s.name }}</h5>
+        <p class="card-text">
+          Price: ${{ s.price }}
+        </p>
+        <form action="{% url 'salad' %}" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="name" value="{{ s.name }}" />
+          <button class="btn btn-primary">Add to cart</button>
+        </form>
+      </div>
+    </div>
+  {% endfor %}
+
+
+  <!-- Dinner Platter -->
+  <h2 class="h4 mt-3">Dinner Platter</h2>
+  <hr>
+  {% for p in dinner_platters %}
+    <div class="card d-inline-block mr-3 mb-4" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{ p.name }}</h5>
+        <p class="card-text">
+          Small: ${{ p.small_price }}
+          <br>
+          Large: ${{ p.large_price }}
+        </p>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#dp-{{ p.name|slugify }}-modal">Get one...</button>
+      </div>
+
+      <div class="modal fade" id="dp-{{ p.name|slugify }}-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">{{ p.name }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form action="{% url 'dinner_platter' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="name" value="{{ p.name }}" />
+
+                <div class="form-group">
+                  <label>Size</label>
+                  <select name="size" class="form-control">
+                    <option value="small">Small - ${{ p.small_price }}</option>
+                    <option value="large">Large - ${{ p.large_price }}</option>
+                  </select>
+                </div>
+
+                <button class="btn btn-primary">Add to cart</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock body %}
