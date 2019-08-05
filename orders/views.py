@@ -66,10 +66,72 @@ def signup_view(request):
     return HttpResponseRedirect(reverse('index'))
 
 def regular_pizza(request):
-    pass
+    user = request.user
+    if not user.is_authenticated:
+        return render(request, 'auth/login.html', {'message': None})
+
+    name = request.POST['name']
+    size = request.POST['size']
+    toppings = request.POST.getlist('toppings')
+
+    cart = user.cart
+    rp = RegularPizza.objects.get(name=name)
+    cart_item = CartItem(
+        cart=cart,
+        product_object_id=rp.pk,
+        product_content_type=ContentType.objects.get_for_model(rp),
+    )
+    if size == 'small':
+        cart_item.price = rp.small_price
+    elif size == 'large':
+        cart_item.price = rp.large_price
+    cart_item.save()
+
+    for t in toppings:
+        topping = Topping.objects.get(name=t)
+        CartItem.objects.create(
+            cart=cart,
+            price=0,
+            product_object_id=topping.pk,
+            product_content_type=ContentType.objects.get_for_model(topping),
+            parent=cart_item,
+        )
+
+    return HttpResponseRedirect(reverse('index'))
 
 def sicilian_pizza(request):
-    pass
+    user = request.user
+    if not user.is_authenticated:
+        return render(request, 'auth/login.html', {'message': None})
+
+    name = request.POST['name']
+    size = request.POST['size']
+    items = request.POST.getlist('items')
+
+    cart = user.cart
+    sp = SicilianPizza.objects.get(name=name)
+    cart_item = CartItem(
+        cart=cart,
+        product_object_id=sp.pk,
+        product_content_type=ContentType.objects.get_for_model(sp),
+    )
+    if size == 'small':
+        cart_item.price = sp.small_price
+    elif size == 'large':
+        cart_item.price = sp.large_price
+    cart_item.save()
+
+    for i in items:
+        topping = Topping.objects.get(name=i)
+        CartItem.objects.create(
+            cart=cart,
+            price=0,
+            product_object_id=topping.pk,
+            product_content_type=ContentType.objects.get_for_model(topping),
+            parent=cart_item,
+        )
+
+    return HttpResponseRedirect(reverse('index'))
 
 def sub(request):
     user = request.user
@@ -84,7 +146,7 @@ def sub(request):
     sub = Sub.objects.get(name=name)
     cart_item = CartItem(
         cart=cart,
-        product_object_id=sub.id,
+        product_object_id=sub.pk,
         product_content_type=ContentType.objects.get_for_model(sub),
     )
     if size == 'small':
@@ -98,7 +160,7 @@ def sub(request):
         CartItem.objects.create(
             cart=cart,
             price=sub_addon.price,
-            product_object_id=sub_addon.id,
+            product_object_id=sub_addon.pk,
             product_content_type=ContentType.objects.get_for_model(sub_addon),
             parent=cart_item,
         )
