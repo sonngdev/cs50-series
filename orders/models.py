@@ -77,6 +77,7 @@ class CartItem(models.Model):
     price = models.FloatField(default=0)
     product_object_id = models.IntegerField()
     product_content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
+    parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name='children')
 
     product = GenericForeignKey('product_content_type', 'product_object_id')
 

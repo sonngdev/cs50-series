@@ -149,8 +149,9 @@
               </button>
             </div>
             <div class="modal-body">
-              <form action="">
+              <form action="/sub" method="POST">
                 {% csrf_token %}
+                <input type="hidden" name="name" value="{{ s.name }}" />
 
                 <div class="form-group">
                   <label>Size</label>
