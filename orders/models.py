@@ -1,0 +1,105 @@
+from django.db import models
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
+# Create your models here.
+class RegularPizza(models.Model):
+    name = models.CharField(max_length=64)
+    small_price = models.FloatField(null=True, blank=True)
+    large_price = models.FloatField(null=True, blank=True)
+    topping_size = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+class SicilianPizza(models.Model):
+    name = models.CharField(max_length=64)
+    small_price = models.FloatField(null=True, blank=True)
+    large_price = models.FloatField(null=True, blank=True)
+    item_size = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+class Topping(models.Model):
+    name = models.CharField(max_length=64)
+
+    def __str__(self):
+        return self.name
+
+class Sub(models.Model):
+    name = models.CharField(max_length=64)
+    small_price = models.FloatField(null=True, blank=True)
+    large_price = models.FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class SubAddon(models.Model):
+    sub = models.ForeignKey(Sub, on_delete=models.CASCADE, related_name='addons')
+    name = models.CharField(max_length=64)
+    price = models.FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class Pasta(models.Model):
+    name = models.CharField(max_length=64)
+    price = models.FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class Salad(models.Model):
+    name = models.CharField(max_length=64)
+    price = models.FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class DinnerPlatter(models.Model):
+    name = models.CharField(max_length=64)
+    small_price = models.FloatField(null=True, blank=True)
+    large_price = models.FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
+
+    def __str__(self):
+        return f'Shopping cart of {self.user.username}'
+
+    @property
+    def items(self):
+        return CartItem.objects.filter(cart=self, status='in_cart')
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    total = models.FloatField(default=0)
+
+    def __str__(self):
+        return f'Order of {self.user.username}'
+
+    @property
+    def items(self):
+        return CartItem.objects.filter(order=self, status='ordered')
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, null=True, on_delete=models.CASCADE)
+    size = models.CharField(max_length=20, null=True)
+    price = models.FloatField(default=0)
+    status = models.CharField(max_length=20, default='in_cart')
+    product_object_id = models.IntegerField()
+    product_content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
+    parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name='children')
+
+    product = GenericForeignKey('product_content_type', 'product_object_id')
+
+    def __str__(self):
+        product_type = str(self.product_content_type).capitalize()
+        size = self.size or 'standard'
+        return f'{product_type} | {self.product.name} - {size} (${self.price})'
