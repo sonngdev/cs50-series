@@ -1,0 +1,30 @@
+{% extends '../base.html' %}
+
+{% block title %}
+  Sign Up
+{% endblock title %}
+
+{% block body %}
+  {% if message %}
+    <div class="alert alert-warning" role="alert">
+      {{ message }}
+    </div>
+  {% endif %}
+
+  <form action="{% url 'signup' %}" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" class="form-control" name="username" placeholder="Unique name" required />
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" class="form-control" name="email" placeholder="Your email" required />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" class="form-control" name="password" placeholder="Secure password" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Sign Up</button>
+  </form>
+{% endblock body %}
