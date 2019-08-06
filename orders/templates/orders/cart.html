@@ -8,12 +8,14 @@
   {% if items %}
     <ul>
       {% for parent_item in items %}
-        <li>{{ parent_item }}</li>
-        <ul>
-          {% for child_item in parent_item.children.all %}
-            <li>{{ child_item }}</li>
-          {% endfor %}
-        </ul>
+        <li>
+          {{ parent_item }}
+          <ul>
+            {% for child_item in parent_item.children.all %}
+              <li>{{ child_item }}</li>
+            {% endfor %}
+          </ul>
+        </li>
       {% endfor %}
     </ul>
     <p><strong>Total: ${{ total }}</strong></p>

@@ -19,8 +19,7 @@ def index(request):
         cart = Cart.objects.create(user=user)
 
     context = {
-        'user': user,
-        'cart_size': cart.items.filter(parent=None).count(),
+        'cart_size': cart.items.filter(status='in_cart', parent=None).count(),
         'regular_pizzas': RegularPizza.objects.all(),
         'sicilian_pizzas': SicilianPizza.objects.all(),
         'toppings': Topping.objects.all(),
@@ -66,15 +65,11 @@ def signup_view(request):
     return HttpResponseRedirect(reverse('index'))
 
 def regular_pizza(request):
-    user = request.user
-    if not user.is_authenticated:
-        return render(request, 'auth/login.html', {'message': None})
-
     name = request.POST['name']
     size = request.POST['size']
     toppings = request.POST.getlist('toppings')
 
-    cart = user.cart
+    cart = request.user.cart
     rp = RegularPizza.objects.get(name=name)
     cart_item = CartItem(
         cart=cart,
@@ -102,15 +97,11 @@ def regular_pizza(request):
     return HttpResponseRedirect(reverse('index'))
 
 def sicilian_pizza(request):
-    user = request.user
-    if not user.is_authenticated:
-        return render(request, 'auth/login.html', {'message': None})
-
     name = request.POST['name']
     size = request.POST['size']
     items = request.POST.getlist('items')
 
-    cart = user.cart
+    cart = request.user.cart
     sp = SicilianPizza.objects.get(name=name)
     cart_item = CartItem(
         cart=cart,
@@ -138,15 +129,11 @@ def sicilian_pizza(request):
     return HttpResponseRedirect(reverse('index'))
 
 def sub(request):
-    user = request.user
-    if not user.is_authenticated:
-        return render(request, 'auth/login.html', {'message': None})
-
     name = request.POST['name']
     size = request.POST['size']
     addons = request.POST.getlist('addons')
 
-    cart = user.cart
+    cart = request.user.cart
     sub = Sub.objects.get(name=name)
     cart_item = CartItem(
         cart=cart,
@@ -174,12 +161,8 @@ def sub(request):
     return HttpResponseRedirect(reverse('index'))
 
 def pasta(request):
-    user = request.user
-    if not user.is_authenticated:
-        return render(request, 'auth/login.html', {'message': None})
-
     name = request.POST['name']
-    cart = user.cart
+    cart = request.user.cart
     pasta = Pasta.objects.get(name=name)
     cart_item = CartItem.objects.create(
         cart=cart,
@@ -191,12 +174,8 @@ def pasta(request):
     return HttpResponseRedirect(reverse('index'))
 
 def salad(request):
-    user = request.user
-    if not user.is_authenticated:
-        return render(request, 'auth/login.html', {'message': None})
-
     name = request.POST['name']
-    cart = user.cart
+    cart = request.user.cart
     salad = Salad.objects.get(name=name)
     cart_item = CartItem.objects.create(
         cart=cart,
@@ -208,14 +187,10 @@ def salad(request):
     return HttpResponseRedirect(reverse('index'))
 
 def dinner_platter(request):
-    user = request.user
-    if not user.is_authenticated:
-        return render(request, 'auth/login.html', {'message': None})
-
     name = request.POST['name']
     size = request.POST['size']
 
-    cart = user.cart
+    cart = request.user.cart
     dp = DinnerPlatter.objects.get(name=name)
     cart_item = CartItem(
         cart=cart,
@@ -234,20 +209,17 @@ def dinner_platter(request):
 
 def cart(request):
     user = request.user
-    if not user.is_authenticated:
-        return render(request, 'auth/login.html', {'message': None})
 
     try:
         cart = user.cart
     except:
         cart = Cart.objects.create(user=user)
 
-    all_items = cart.items.all()
+    all_items = cart.items.filter(status='in_cart').all()
     total = sum(item.price for item in all_items)
     items = all_items.filter(parent=None).all()
 
     context = {
-        'user': user,
         'cart_size': len(items),
         'items': items,
         'total': total,
@@ -256,12 +228,26 @@ def cart(request):
 
 def order(request):
     user = request.user
-    if not user.is_authenticated:
-        return render(request, 'auth/login.html', {'message': None})
-
-    items = user.cart.items.all()
+    items = user.cart.items.filter(status='in_cart').all()
     total = sum(item.price for item in items)
     order = Order.objects.create(user=user, total=total)
     items.update(status='ordered', order=order)
 
     return HttpResponseRedirect(reverse('index'))
+
+def orders(request):
+    orders = {}
+    for o in Order.objects.all():
+        items = {}
+        parents = o.items.filter(status='ordered', parent=None).all()
+        for p in parents:
+            items[p] = p.children.all()
+        orders[o] = items
+
+    cart_size = request.user.cart.items.filter(status='in_cart', parent=None).count()
+
+    context = {
+        'cart_size': cart_size,
+        'orders': orders,
+    }
+    return render(request, 'orders/orders.html', context)

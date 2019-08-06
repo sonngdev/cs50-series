@@ -41,6 +41,11 @@
               {% endif %}
             </a>
           </li>
+          {% if user.is_staff %}
+            <li class="nav-item">
+              <a href="{% url 'orders' %}" class="nav-link">Orders</a>
+            </li>
+          {% endif %}
           <li class="nav-item">
             <a href="{% url 'logout' %}" class="nav-link">Log Out</a>
           </li>

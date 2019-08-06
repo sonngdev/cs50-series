@@ -72,24 +72,20 @@ class Cart(models.Model):
     def __str__(self):
         return f'Shopping cart of {self.user.username}'
 
-    @property
-    def items(self):
-        return CartItem.objects.filter(cart=self, status='in_cart')
-
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     total = models.FloatField(default=0)
 
     def __str__(self):
-        return f'Order of {self.user.username}'
+        return f'Order of {self.user.username} (${self.total})'
 
-    @property
-    def items(self):
-        return CartItem.objects.filter(order=self, status='ordered')
+class CartItemManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(parent=None)
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, null=True, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    order = models.ForeignKey(Order, null=True, on_delete=models.CASCADE, related_name='items')
     size = models.CharField(max_length=20, null=True)
     price = models.FloatField(default=0)
     status = models.CharField(max_length=20, default='in_cart')
@@ -98,6 +94,8 @@ class CartItem(models.Model):
     parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name='children')
 
     product = GenericForeignKey('product_content_type', 'product_object_id')
+    objects = models.Manager()
+    parents = CartItemManager()
 
     def __str__(self):
         product_type = str(self.product_content_type).capitalize()
