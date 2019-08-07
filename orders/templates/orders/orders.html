@@ -1,0 +1,31 @@
+{% extends '../base.html' %}
+
+{% block title %}
+  Orders
+{% endblock title %}
+
+{% block body %}
+  {% if orders %}
+    <ul class="list-unstyled">
+      {% for order, items in orders.items %}
+        <li class="mb-4">
+          <h2 class="h4">{{ order }}</h2>
+          <ul>
+            {% for parent, children in items.items %}
+              <li>
+                {{ parent }}
+                <ul>
+                  {% for child in children %}
+                    <li>{{ child }}</li>
+                  {% endfor %}
+                </ul>
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p><em>No orders placed yet.</em></p>
+  {% endif %}
+{% endblock body %}
