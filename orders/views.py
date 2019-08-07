@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout, models
 from django.contrib.contenttypes.models import ContentType
+from django.core.mail import send_mail
 from django.db.utils import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -232,6 +233,20 @@ def order(request):
     total = sum(item.price for item in items)
     order = Order.objects.create(user=user, total=total)
     items.update(status='ordered', order=order)
+
+    # Local SMTP Server:
+    # python -m smtpd -n -c DebuggingServer localhost:1025
+    #
+    # Run the above command to simulate email notification
+    #
+    # Configure EMAIL_HOST and EMAIL_PORT in settings.py
+    # to `localhost` and `1025`, respectively
+    send_mail(
+        'Order confirmed',
+        'Your order has been confirmed. Wait for your pizzas to arrive soon :D',
+        'nguyen.thanhson@cs50w.project3',
+        [user.email],
+    )
 
     return HttpResponseRedirect(reverse('index'))
 
