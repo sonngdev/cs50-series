@@ -2,7 +2,7 @@
 
 This is my personal progress on Harvard's series of software programming courses, known as CS50. 
 
-To date, I've completed two courses, [CS50's Introduction to Computer Science (CS50)](CS50's Introduction to Computer Science) and [CS50's Web Programming with Python and JavaScript (CS50W)](CS50's Web Programming with Python and JavaScript).
+To date, I've completed two courses, [CS50's Introduction to Computer Science (CS50)](https://courses.edx.org/courses/course-v1:HarvardX+CS50+X/course/) and [CS50's Web Programming with Python and JavaScript (CS50W)](https://courses.edx.org/courses/course-v1:HarvardX+CS50W+Web/course/).
 
 Every assignment project of each course sits on its own branch, as specified below.
 
@@ -10,7 +10,7 @@ Every assignment project of each course sits on its own branch, as specified bel
 
 Branches that start with `cs50`.
 
-These projects are small and medium exercises, implemented in a range of languagues (**Scratch**, **C** and **Python**).
+These projects are small and medium exercises, implemented in a range of languagues (**C** and **Python**).
 
 ### CS50's Web Programming with Python and JavaScript (CS50W)
 
